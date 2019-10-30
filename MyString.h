@@ -44,8 +44,6 @@ public:
 
     friend std::ostream &operator<<(std::ostream &os, const MyString &string);
 
-    void leaveValue();
-
     void reset();
 
     size_t length() const;
@@ -68,8 +66,12 @@ public:
 
     char operator[](size_t idx) const;
 
+    virtual ~MyString();
+
 private:
     StringValue * reference;
+
+    void leaveValue();
 };
 
 std::istream &operator>>(std::istream &is, MyString &string);

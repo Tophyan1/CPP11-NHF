@@ -162,3 +162,8 @@ char *MyString::c_str() {
         throw std::range_error("No string :c");
     return this->reference->getStr();
 }
+
+MyString::~MyString() {
+    if (this->reference != nullptr)
+        this->leaveValue();
+}
