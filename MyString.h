@@ -32,7 +32,7 @@ class MyString {
 public:
     MyString();
 
-    explicit MyString(StringValue *reference);
+//    explicit MyString(StringValue *reference);
 
     MyString(const MyString & cpy);
 
@@ -62,6 +62,7 @@ public:
 
     MyString &operator+=(char c);
 
+    char *c_str();
 
     char &operator[](size_t idx);
 

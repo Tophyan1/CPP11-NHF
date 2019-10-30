@@ -43,7 +43,7 @@ MyString::MyString() {
     this->reference = new StringValue();
 }
 
-MyString::MyString(StringValue *reference) : reference(reference) {}
+//MyString::MyString(StringValue *reference) : reference(reference) {}
 
 MyString::MyString(const MyString & cpy) {
     this->reference = cpy.reference;
@@ -107,7 +107,7 @@ MyString MyString::operator+(const MyString &rhs) const {
     char *tmp = new char[size];
     strcpy(tmp, this->reference->getStr());
     strcat(tmp, rhs.reference->getStr());
-    auto && ret = MyString(tmp);
+    auto ret = MyString(tmp);
     delete[] tmp;
     return ret;
 }
@@ -155,4 +155,10 @@ char &MyString::operator[](size_t idx) {
 
 char MyString::operator[](size_t idx) const {
     return this->reference->getStr()[idx];
+}
+
+char *MyString::c_str() {
+    if (this->reference == nullptr)
+        throw std::range_error("No string :c");
+    return this->reference->getStr();
 }
