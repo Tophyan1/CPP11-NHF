@@ -122,7 +122,8 @@ MyString MyString::operator+(char c) const {
     strcpy(tmp, this->reference->getStr());
     tmp[this->length()] = c;
     tmp[this->length() + 1] = '\0';
-    auto && ret = MyString(tmp);
+    auto ret = MyString(tmp);
+    delete[] tmp;
     return ret;
 }
 
