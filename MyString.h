@@ -4,7 +4,7 @@
 
 #include <string>
 #include <iostream>
-
+#include <set>
 
 
 class StringValue {
@@ -68,8 +68,10 @@ public:
 
 private:
     StringValue * reference;
+    static std::set<StringValue> values;
 
     void leaveValue();
+
 };
 
 std::istream &operator>>(std::istream &is, MyString &string);

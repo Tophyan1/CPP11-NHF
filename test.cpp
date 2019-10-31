@@ -162,7 +162,5 @@ int main() {
     MyString input;
     std::cin >> input;
     std::cout << input << std::endl;
-
-
 }
 

@@ -40,7 +40,12 @@ StringValue::StringValue() {
 }
 
 MyString::MyString() {
-    this->reference = new StringValue();
+    if (MyString::values.find(StringValue()) != MyString::values.end())
+        this->reference = new StringValue();
+    else {
+        auto ref = MyString::values.find(StringValue());
+        this->reference = &(*ref);
+    }
 }
 
 MyString::MyString(const MyString & cpy) {
