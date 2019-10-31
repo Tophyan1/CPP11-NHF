@@ -43,8 +43,6 @@ MyString::MyString() {
     this->reference = new StringValue();
 }
 
-//MyString::MyString(StringValue *reference) : reference(reference) {}
-
 MyString::MyString(const MyString & cpy) {
     this->reference = cpy.reference;
     this->reference->addReference();

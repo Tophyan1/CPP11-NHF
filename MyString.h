@@ -32,8 +32,6 @@ class MyString {
 public:
     MyString();
 
-//    explicit MyString(StringValue *reference);
-
     MyString(const MyString & cpy);
 
     MyString(MyString && cpy) noexcept;
