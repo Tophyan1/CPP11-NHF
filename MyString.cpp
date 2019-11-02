@@ -11,6 +11,11 @@ StringValue::StringValue(const char *str) {
     this->refCount = 1;
 }
 
+StringValue::StringValue(char *str, Adopt adopt) {
+    this->str = str;
+    this->refCount = 1;
+}
+
 char *StringValue::getStr() const {
     return str;
 }
@@ -40,67 +45,66 @@ StringValue::StringValue() {
 }
 
 MyString::MyString() {
-    if (MyString::values.find(StringValue()) != MyString::values.end())
-        this->reference = new StringValue();
-    else {
-        auto ref = MyString::values.find(StringValue());
-        this->reference = &(*ref);
-    }
+    this->stringVal = new StringValue();
 }
 
 MyString::MyString(const MyString & cpy) {
-    this->reference = cpy.reference;
-    this->reference->addReference();
+    this->stringVal = cpy.stringVal;
+    this->stringVal->addReference();
 }
 
 MyString::MyString(MyString && cpy) noexcept {
-    this->reference = cpy.reference;
-    cpy.reference = nullptr;
+    this->stringVal = cpy.stringVal;
+    cpy.stringVal = nullptr;
 }
 
 MyString::MyString(const char *str) {
-    this->reference = new StringValue(str);
+    this->stringVal = new StringValue(str);
 }
 
-MyString::MyString(std::string &str) {
-    this->reference = new StringValue(str.c_str());
+MyString::MyString(char *str, Adopt adopt) {
+    this->stringVal = new StringValue(str, adopt);
+}
+
+MyString::MyString(const std::string &str) {
+    this->stringVal = new StringValue(str.c_str());
 }
 
 std::ostream &operator<<(std::ostream &os, const MyString &string) {
-    os << string.reference->getStr();
+    os << string.stringVal->getStr();
     return os;
 }
 
-void MyString::leaveValue() {
-    this->reference->takeReference();
-    if (this->reference->getRefCount() == 0)
-        delete this->reference;
-    this->reference = nullptr;
+void MyString::dropValue() {
+    this->stringVal->takeReference();
+    if (this->stringVal->getRefCount() == 0)
+        delete this->stringVal;
+    this->stringVal = nullptr;
 }
 
 void MyString::reset() {
-    this->leaveValue();
-    this->reference = new StringValue();
+    this->dropValue();
+    this->stringVal = new StringValue();
 }
 
 size_t MyString::length() const {
-    return strlen(this->reference->getStr());
+    return strlen(this->stringVal->getStr());
 }
 
 MyString &MyString::operator=(const MyString &rhs) {
     if (this != &rhs) {
-        this->leaveValue();
-        this->reference = rhs.reference;
-        this->reference->addReference();
+        this->dropValue();
+        this->stringVal = rhs.stringVal;
+        this->stringVal->addReference();
     }
     return *this;
 }
 
 MyString &MyString::operator=(MyString &&rhs) noexcept {
     if (&rhs != this) {
-        this->leaveValue();
-        this->reference = rhs.reference;
-        rhs.reference = nullptr;
+        this->dropValue();
+        this->stringVal = rhs.stringVal;
+        rhs.stringVal = nullptr;
     }
     return *this;
 }
@@ -108,8 +112,8 @@ MyString &MyString::operator=(MyString &&rhs) noexcept {
 MyString MyString::operator+(const MyString &rhs) const {
     size_t size = this->length() + rhs.length() + 1;
     char *tmp = new char[size];
-    strcpy(tmp, this->reference->getStr());
-    strcat(tmp, rhs.reference->getStr());
+    strcpy(tmp, this->stringVal->getStr());
+    strcat(tmp, rhs.stringVal->getStr());
     auto ret = MyString(tmp);
     delete[] tmp;
     return ret;
@@ -122,7 +126,7 @@ MyString &MyString::operator+=(const MyString &rhs) {
 
 MyString MyString::operator+(char c) const {
     char *tmp = new char[this->length() + 2];
-    strcpy(tmp, this->reference->getStr());
+    strcpy(tmp, this->stringVal->getStr());
     tmp[this->length()] = c;
     tmp[this->length() + 1] = '\0';
     auto ret = MyString(tmp);
@@ -147,26 +151,26 @@ std::istream &operator>>(std::istream &is, MyString &string) {
 }
 
 char &MyString::operator[](size_t idx) {
-    if (this->reference->getRefCount() > 1) {
-        MyString temp(this->reference->getStr());
-        this->leaveValue();
-        this->reference = temp.reference;
-        this->reference->addReference();
+    if (this->stringVal->getRefCount() > 1) {
+        MyString temp(this->stringVal->getStr());
+        this->dropValue();
+        this->stringVal = temp.stringVal;
+        this->stringVal->addReference();
     }
-    return this->reference->getStr()[idx];
+    return this->stringVal->getStr()[idx];
 }
 
 char MyString::operator[](size_t idx) const {
-    return this->reference->getStr()[idx];
+    return this->stringVal->getStr()[idx];
 }
 
 char *MyString::c_str() {
-    if (this->reference == nullptr)
+    if (this->stringVal == nullptr)
         throw std::range_error("No string :c");
-    return this->reference->getStr();
+    return this->stringVal->getStr();
 }
 
 MyString::~MyString() {
-    if (this->reference != nullptr)
-        this->leaveValue();
+    if (this->stringVal != nullptr)
+        this->dropValue();
 }

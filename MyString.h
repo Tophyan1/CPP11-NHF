@@ -6,10 +6,13 @@
 #include <iostream>
 #include <set>
 
+enum Adopt { AdoptValue };
 
 class StringValue {
 public:
     StringValue(const char *str);
+
+    StringValue(char *str, Adopt adopt);
 
     StringValue();
 
@@ -38,7 +41,9 @@ public:
 
     MyString(const char *str);
 
-    MyString(std::string & str);
+    MyString(char *str, Adopt adopt);
+
+    MyString(const std::string &str);
 
     friend std::ostream &operator<<(std::ostream &os, const MyString &string);
 
@@ -64,13 +69,12 @@ public:
 
     char operator[](size_t idx) const;
 
-    virtual ~MyString();
+    ~MyString();
 
 private:
-    StringValue * reference;
-    static std::set<StringValue> values;
+    StringValue * stringVal;
 
-    void leaveValue();
+    void dropValue();
 
 };
 
